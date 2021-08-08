@@ -1,0 +1,60 @@
+<script>
+  window.vue = new Vue({
+    el: "#app",
+    data: {
+      page: "root",
+      page_edit: "input",
+      edit_target: "",
+      edit_source: "",
+      analyze_failed: false,
+      form_url: "",
+      form_class_entry: "",
+      form_class_list: [],
+      form_number_entry: "",
+      form_number_size: 0,
+      form_name_entry: "",
+      form_date_entry: "",
+    },
+    methods: {
+      analyze() {
+        try {
+          this.analyze_failed = false;
+          let data = JSON.parse(this.edit_source.match(/var FB_PUBLIC_LOAD_DATA_ = ([\s\S]*?);<\/script>/)[1]);
+          const ENTRY_CLASS = 0;
+          const ENTRY_NUMBER = 1;
+          const ENTRY_NAME = 2;
+          const ENTRY_DATE = 3;
+          this.form_url = data[14].split("/")[1];
+          this.form_class_entry = data[1][1][ENTRY_CLASS][4][0][0];
+          // 検証ポイント
+          this.form_class_list = data[1][1][ENTRY_CLASS][4][0][1].map((v) => {
+            return v[0];
+          });
+          this.form_number_entry = data[1][1][ENTRY_NUMBER][4][0][0];
+          this.form_number_size = data[1][1][ENTRY_NUMBER][4][0][1].length;
+          this.form_name_entry = data[1][1][ENTRY_NAME][4][0][0];
+          this.form_date_entry = data[1][1][ENTRY_DATE][4][0][0];
+
+          this.page_edit = "verification";
+        } catch (error) {
+          this.analyze_failed = true;
+          console.log(error);
+        }
+      },
+      register() {
+        this.page_edit = "updating";
+        let json = JSON.stringify([this.form_url, this.form_class_entry, this.form_class_list, this.form_number_entry, this.form_number_size, this.form_name_entry, this.form_date_entry]);
+        google.script.run
+          .withSuccessHandler(function (msg) {
+            window.vue.page_edit = "complete";
+            setTimeout(() => {
+              let url = new URL(window.service_url);
+              url.searchParams.set("role", "control");
+              window.open(url, "_top");
+            }, 3000);
+          })
+          .register(this.edit_target, json);
+      },
+    },
+  });
+</script>
