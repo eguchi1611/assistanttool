@@ -34,10 +34,10 @@
           <h1 class="display-4">コントロールパネル</h1>
           <p class="lead">健康観察フォーム入力支援ツールの設定を行います</p>
         </div>
-        <div class="container-fluid" style="max-width: 800px">
+        <div class="container-fluid" style="max-width: 960px">
           <div class="row">
-            <div class="col-sm-6 my-2">
-              <div class="card shadow-sm">
+            <div class="col-lg-4 my-2">
+              <div class="card border-primary shadow-sm">
                 <div class="card-body">
                   <h5 class="card-title">フォームを変更する</h5>
                   <p class="card-text">各学年ごとに割り当てられているフォームを変更します</p>
@@ -45,12 +45,21 @@
                 </div>
               </div>
             </div>
-            <div class="col-sm-6 my-2">
-              <div class="card shadow-sm">
+            <div class="col-lg-4 my-2">
+              <div class="card border-primary shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title">フォーム一覧</h5>
+                  <p class="card-text">登録されているフォームの確認、削除を行います</p>
+                  <a href="javascript:void(0)" class="btn btn-primary stretched-link" v-on:click="page = 'list'">進む</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4 my-2">
+              <div class="card border-primary shadow-sm">
                 <div class="card-body">
                   <h5 class="card-title">登録済みフォームの確認</h5>
                   <p class="card-text">クラスなどの選択肢が正しいかを確認します</p>
-                  <a href="#" class="btn btn-primary stretched-link">進む</a>
+                  <a href="javascript:void(0)" class="btn btn-primary stretched-link" v-on:click="page = 'view'">進む</a>
                 </div>
               </div>
             </div>
@@ -63,8 +72,8 @@
           <div class="card-header">フォームを変更する</div>
           <div class="card-body">
             <div class="container-fluid" v-if="page_edit == 'input'">
+              <p class="card-text">以下の手順に従ってフォームを変更してください</p>
               <form @submit.prevent="analyze()">
-                <p class="card-text">以下の手順に従ってフォームを変更してください</p>
                 <div class="mb-3">
                   <label class="form-label">1. どの学年のフォームを変更するのか選択してください</label>
                   <select class="form-select" v-model="edit_target" required>
@@ -118,6 +127,107 @@
             </div>
             <div class="container-fluid" v-if="page_edit == 'complete'">
               <p class="card-text">登録が完了しました<br />まもなくページが再読み込みされます</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid" style="max-width: 800px" v-if="page == 'list'">
+        <button class="btn btn-link mb-2" v-on:click="page = 'root'">ホームに戻る</button>
+        <div class="card">
+          <div class="card-header">フォーム一覧</div>
+          <div class="card-body">
+            <div class="container-fluid">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                    <th scope="col">Handle</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">1</th>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2</th>
+                    <td>Jacob</td>
+                    <td>Thornton</td>
+                    <td>@fat</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">3</th>
+                    <td colspan="2">Larry the Bird</td>
+                    <td>@twitter</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid" style="max-width: 800px" v-if="page == 'view'">
+        <button class="btn btn-link mb-2" v-on:click="page = 'root'">ホームに戻る</button>
+        <div class="card">
+          <div class="card-header">登録済みフォームの確認</div>
+          <div class="card-body">
+            <div class="container-fluid">
+              <p class="card-text">登録されているフォームの詳細情報を確認できます<br />登録されているもののみ表示しています</p>
+              <div class="mb-3">
+                <label class="form-label">表示する学年</label>
+                <select class="form-select" v-model="view_selected">
+                  <option value="" disabled selected>選択してください</option>
+                  <option v-bind:value="key" v-for="key of Object.keys(current_forms)">{{ key }}年度入学（{{ key - 1977 }}期生）</option>
+                </select>
+              </div>
+              <div class="card card-body">
+                <div class="container-fluid" v-if="view_selected">
+                  <div class="mb-3">
+                    <label class="form-label">フォームURL</label>
+                    <label class="form-label w-100 text-truncate text-primary"><a class="text-primary" v-bind:href="`https:\/\/docs.google.com\/forms\/d\/e\/${current_forms[view_selected][0]}\/viewform`" target="_blank">{{ `https:\/\/docs.google.com\/forms\/d\/e\/${current_forms[view_selected][0]}\/viewform` }}</a></label>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">クラスの選択肢</label>
+                    <select class="form-select">
+                      <option value="" disabled selected>選択してください</option>
+                      <option v-bind:value="val" v-for="val of current_forms[view_selected][2]">{{ val }}</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">番号の選択肢</label>
+                    <select class="form-select">
+                      <option value="" disabled selected>選択してください</option>
+                      <option v-bind:value="val" v-for="val of current_forms[view_selected][4]">{{ val }}</option>
+                    </select>
+                  </div>
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" id="show_details" type="checkbox" v-model:value="view_show_details" />
+                    <label class="form-check-label" for="show_details">詳細を表示する</label>
+                  </div>
+                  <div v-if="view_show_details">
+                    <div class="mb-3">
+                      <label class="form-label">クラス Entry ID</label>
+                      <input class="form-control-plaintext" type="text" readonly v-bind:value="current_forms[view_selected][1]" />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">番号 Entry ID</label>
+                      <input class="form-control-plaintext" type="text" readonly v-bind:value="current_forms[view_selected][3]" />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">氏名 Entry ID</label>
+                      <input class="form-control-plaintext" type="text" readonly v-bind:value="current_forms[view_selected][5]" />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">日付 Entry ID</label>
+                      <input class="form-control-plaintext" type="text" readonly v-bind:value="current_forms[view_selected][6]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -14,6 +14,9 @@
       form_number_size: 0,
       form_name_entry: "",
       form_date_entry: "",
+      current_forms: {},
+      view_selected: "",
+      view_show_details: false,
     },
     methods: {
       analyze() {
@@ -55,6 +58,17 @@
           })
           .register(this.edit_target, json);
       },
+    },
+    created() {
+      google.script.run
+        .withSuccessHandler(function (data) {
+          let temp = {};
+          for (let key of Object.keys(data)) {
+            temp[key] = JSON.parse(data[key]);
+          }
+          window.vue.current_forms = temp;
+        })
+        .download();
     },
   });
 </script>

@@ -14,3 +14,8 @@ function register(target, json) {
   }
   return 0;
 }
+
+function download() {
+  const KEY_FORMS = "forms";
+  return JSON.parse(PropertiesService.getScriptProperties().getProperty(KEY_FORMS)) || {};
+}
