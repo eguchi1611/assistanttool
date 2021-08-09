@@ -39,9 +39,9 @@
             <div class="col-lg-4 my-2">
               <div class="card border-primary shadow-sm">
                 <div class="card-body">
-                  <h5 class="card-title">フォームを変更する</h5>
-                  <p class="card-text">各学年ごとに割り当てられているフォームを変更します</p>
-                  <a href="javascript:void(0)" class="btn btn-primary stretched-link" v-on:click="page = 'setting'">進む</a>
+                  <h5 class="card-title">フォームを登録する</h5>
+                  <p class="card-text">各学年ごとに割り当てられているフォームを登録（変更）します</p>
+                  <a href="javascript:void(0)" class="btn btn-primary stretched-link" @click="page = 'setting'">進む</a>
                 </div>
               </div>
             </div>
@@ -50,7 +50,7 @@
                 <div class="card-body">
                   <h5 class="card-title">フォーム一覧</h5>
                   <p class="card-text">登録されているフォームの確認、削除を行います</p>
-                  <a href="javascript:void(0)" class="btn btn-primary stretched-link" v-on:click="page = 'list'">進む</a>
+                  <a href="javascript:void(0)" class="btn btn-primary stretched-link" @click="page = 'list'">進む</a>
                 </div>
               </div>
             </div>
@@ -59,7 +59,7 @@
                 <div class="card-body">
                   <h5 class="card-title">登録済みフォームの確認</h5>
                   <p class="card-text">クラスなどの選択肢が正しいかを確認します</p>
-                  <a href="javascript:void(0)" class="btn btn-primary stretched-link" v-on:click="page = 'view'">進む</a>
+                  <a href="javascript:void(0)" class="btn btn-primary stretched-link" @click="page = 'view'">進む</a>
                 </div>
               </div>
             </div>
@@ -67,7 +67,7 @@
         </div>
       </div>
       <div class="container-fluid" style="max-width: 800px" v-if="page == 'setting'">
-        <button class="btn btn-link mb-2" v-on:click="page = 'root'">ホームに戻る</button>
+        <button class="btn btn-link mb-2" @click="page = 'root'">ホームに戻る</button>
         <div class="card">
           <div class="card-header">フォームを変更する</div>
           <div class="card-body">
@@ -78,9 +78,7 @@
                   <label class="form-label">1. どの学年のフォームを変更するのか選択してください</label>
                   <select class="form-select" v-model="edit_target" required>
                     <option value="" disabled selected>選択してください</option>
-                    <option value="2020">2020年度入学（43期生）</option>
-                    <option value="2019">2019年度入学（42期生）</option>
-                    <option value="2018">2018年度入学（41期生）</option>
+                    <option v-bind:value="key" v-for="key of Object.keys(current_forms)">{{ key }}年度入学（{{ key - 1977 }}期生）</option>
                   </select>
                 </div>
                 <div class="mb-3">
@@ -97,7 +95,7 @@
               </form>
             </div>
             <div class="container-fluid" v-if="page_edit == 'verification'">
-              <button class="btn btn-link mb-1" v-on:click="page_edit = 'input'">戻る</button>
+              <button class="btn btn-link mb-1" @click="page_edit = 'input'">戻る</button>
               <p class="card-text">ソースを解析しました<br />クラスなどの選択肢が正しいか確認してください</p>
               <div class="card card-body">
                 <div class="mb-3">
@@ -116,10 +114,10 @@
                 </div>
               </div>
               <div>
-                <button class="btn btn-primary mt-3" v-on:click="register()">登録を完了する</button>
+                <button class="btn btn-primary mt-3" @click="register()">登録を完了する</button>
               </div>
             </div>
-            <div class="container-fluid" v-if="page_edit == 'updating'">
+            <div class="container-fluid" v-if="page_edit == 'loading'">
               <div class="my-5 text-center">
                 <div class="spinner-border text-primary"></div>
                 <p>読み込み中</p>
@@ -132,46 +130,53 @@
         </div>
       </div>
       <div class="container-fluid" style="max-width: 800px" v-if="page == 'list'">
-        <button class="btn btn-link mb-2" v-on:click="page = 'root'">ホームに戻る</button>
+        <button class="btn btn-link mb-2" @click="page = 'root'">ホームに戻る</button>
         <div class="card">
           <div class="card-header">フォーム一覧</div>
           <div class="card-body">
-            <div class="container-fluid">
+            <div class="container-fluid" v-if="page_list == 'root'">
               <table class="table table-striped">
                 <thead>
                   <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
+                    <th scope="col">対象学年</th>
+                    <th scope="col">フォームリンク</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">3</th>
-                    <td colspan="2">Larry the Bird</td>
-                    <td>@twitter</td>
+                  <tr v-for="key of Object.keys(current_forms)">
+                    <th scope="row">{{ key }}年度入学（{{ key - 1977 }}期生）</th>
+                    <td><a v-bind:href="`https:\/\/docs.google.com\/forms\/d\/e\/${current_forms[key][0]}\/viewform`" v-if="current_forms[key].length" target="_blank">{{ `https:\/\/docs.google.com\/forms\/d\/e\/${current_forms[key][0]}\/viewform`.substring(0, 27) + "..." }}</a></td>
+                    <td><a class="text-success" href="javascript:void(0)" v-if="current_forms[key].length" @click="page = 'view'; view_selected = key">詳細</a></td>
+                    <td>
+                      <a class="text-danger" href="javascript:void(0)" v-if="current_forms[key].length" @click="list_delete = key; page_list = 'delete'">削除</a>
+                      <a class="text-primary" href="javascript:void(0)" v-if="!current_forms[key].length" @click="page = 'setting'; edit_target = key">登録</a>
+                    </td>
                   </tr>
                 </tbody>
               </table>
+            </div>
+            <div class="container-fluid" v-if="page_list == 'delete'">
+              <button class="btn btn-link mb-2" @click="page_list = 'root'">戻る</button>
+              <p class="card-text">フォームデータを削除します<br />下のボタンをクリックしてください</p>
+              <p class="card-text">削除対象：{{ list_delete }}年度入学（{{ list_delete - 1977 }}期生）</p>
+              <button class="btn btn-outline-danger" type="button" @click="deleteForm()">削除</button>
+            </div>
+            <div class="container-fluid" v-if="page_list == 'loading'">
+              <div class="my-5 text-center">
+                <div class="spinner-border text-primary"></div>
+                <p>読み込み中</p>
+              </div>
+            </div>
+            <div class="container-fluid" v-if="page_list == 'complete'">
+              <p class="card-text">削除が完了しました<br />まもなくページが再読み込みされます</p>
             </div>
           </div>
         </div>
       </div>
       <div class="container-fluid" style="max-width: 800px" v-if="page == 'view'">
-        <button class="btn btn-link mb-2" v-on:click="page = 'root'">ホームに戻る</button>
+        <button class="btn btn-link mb-2" @click="page = 'root'">ホームに戻る</button>
         <div class="card">
           <div class="card-header">登録済みフォームの確認</div>
           <div class="card-body">
@@ -181,13 +186,13 @@
                 <label class="form-label">表示する学年</label>
                 <select class="form-select" v-model="view_selected">
                   <option value="" disabled selected>選択してください</option>
-                  <option v-bind:value="key" v-for="key of Object.keys(current_forms)">{{ key }}年度入学（{{ key - 1977 }}期生）</option>
+                  <option v-bind:value="key" v-for="key of Object.keys(current_forms)" v-if="current_forms[key].length">{{ key }}年度入学（{{ key - 1977 }}期生）</option>
                 </select>
               </div>
               <div class="card card-body">
                 <div class="container-fluid" v-if="view_selected">
                   <div class="mb-3">
-                    <label class="form-label">フォームURL</label>
+                    <label class="form-label">フォームリンク</label>
                     <label class="form-label w-100 text-truncate text-primary"><a class="text-primary" v-bind:href="`https:\/\/docs.google.com\/forms\/d\/e\/${current_forms[view_selected][0]}\/viewform`" target="_blank">{{ `https:\/\/docs.google.com\/forms\/d\/e\/${current_forms[view_selected][0]}\/viewform` }}</a></label>
                   </div>
                   <div class="mb-3">

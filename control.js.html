@@ -4,6 +4,7 @@
     data: {
       page: "root",
       page_edit: "input",
+      page_list: "root",
       edit_target: "",
       edit_source: "",
       analyze_failed: false,
@@ -17,6 +18,7 @@
       current_forms: {},
       view_selected: "",
       view_show_details: false,
+      list_delete: "",
     },
     methods: {
       analyze() {
@@ -45,7 +47,7 @@
         }
       },
       register() {
-        this.page_edit = "updating";
+        this.page_edit = "loading";
         let json = JSON.stringify([this.form_url, this.form_class_entry, this.form_class_list, this.form_number_entry, this.form_number_size, this.form_name_entry, this.form_date_entry]);
         google.script.run
           .withSuccessHandler(function (msg) {
@@ -58,15 +60,24 @@
           })
           .register(this.edit_target, json);
       },
+      deleteForm() {
+        this.page_list = "loading";
+        google.script.run
+          .withSuccessHandler(function (msg) {
+            window.vue.page_list = "complete";
+            setTimeout(() => {
+              let url = new URL(window.service_url);
+              url.searchParams.set("role", "control");
+              window.open(url, "_top");
+            }, 3000);
+          })
+          .deleteForm(this.list_delete);
+      },
     },
     created() {
       google.script.run
         .withSuccessHandler(function (data) {
-          let temp = {};
-          for (let key of Object.keys(data)) {
-            temp[key] = JSON.parse(data[key]);
-          }
-          window.vue.current_forms = temp;
+          window.vue.current_forms = data;
         })
         .download();
     },
