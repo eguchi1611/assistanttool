@@ -67,7 +67,7 @@ function download() {
 
 function login() {
   let email = Session.getActiveUser().getEmail();
-  let tag = email.substring(3, 7);
+  let tag = "20" + email.substring(3, 5);
   const KEY_FORMS = "forms";
   let data = JSON.parse(PropertiesService.getScriptProperties().getProperty(KEY_FORMS)) || {};
   if (data[tag]) {
