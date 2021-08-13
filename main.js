@@ -10,6 +10,9 @@ function doGet(e) {
       template.message = "コントロールパネルにアクセスする権限がありません";
       return template.evaluate().addMetaTag("viewport", "width=device-width, initial-scale=1.0").setTitle("エラー - 健康観察フォーム入力支援ツール");
     }
+  } else if (e.parameter.role == "control_panel") {
+    let url = ScriptApp.getService().getUrl() + "?role=control"
+    return HtmlService.createHtmlOutput(`<script>window.top.location.href='${url}';</script>`);
   }
   let template = HtmlService.createTemplateFromFile("root");
   template.my_class = e.parameter.class;
